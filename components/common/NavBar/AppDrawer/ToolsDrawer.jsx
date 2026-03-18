@@ -1,14 +1,13 @@
-import { Divider, List, ListItem, ListItemIcon, ListItemText, Stack } from '@mui/material';
+import { Divider, List, ListItemIcon, ListItemText, Stack } from '@mui/material';
 import React, { useContext } from 'react';
 import { useRouter } from 'next/router';
 import { AppContext } from '../../context/AppProvider';
-import Kofi from '../../Kofi';
 
 import ListItemButton from '@mui/material/ListItemButton';
 import { PAGES } from '@components/constants';
 import { prefix } from '@utility/helpers';
 
-export const offlineTools = { cardSearch: true, builds: true, itemBrowser: true, itemPlanner: true };
+export const offlineTools = { cardSearch: true, builds: true, itemBrowser: true, itemPlanner: true, enhancedConstellations: true, toolChecker: true, slabCrafter: true, bagChecker: true };
 
 const ToolsDrawer = ({ fromList }) => {
   const { state } = useContext(AppContext);
@@ -51,13 +50,6 @@ const ToolsDrawer = ({ fromList }) => {
         </ListItemButton>;
       })}
     </List>
-    {!fromList ? <List style={{ marginTop: 'auto', paddingBottom: 0 }}>
-      <ListItem>
-        <ListItemText>
-          <Kofi display={'inline-block'}/>
-        </ListItemText>
-      </ListItem>
-    </List> : null}
     <Divider/>
   </Stack>;
 };

@@ -272,6 +272,18 @@ export const PAGES = {
     },
     'guaranteedDropCalculator': {
       icon: 'data/TreeInterior1b'
+    },
+    'enhancedConstellations': {
+      icon: 'data/StarTitle1'
+    },
+    'toolChecker': {
+      icon: 'data/EquipmentToolsHatchet5'
+    },
+    'slabCrafter': {
+      icon: 'etc/Slab'
+    },
+    'bagChecker': {
+      icon: 'data/InvBag109'
     }
   }
 }

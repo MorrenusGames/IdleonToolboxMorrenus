@@ -4,7 +4,6 @@ import { Collapse, Divider, List, ListItem, ListItemIcon, ListItemText, Stack } 
 import React, { useContext, useState } from 'react';
 import { prefix } from '@utility/helpers';
 import { useRouter } from 'next/router';
-import Kofi from '../../Kofi';
 import { AppContext } from '@components/common/context/AppProvider';
 import { format } from 'date-fns';
 
@@ -102,13 +101,6 @@ const AccountDrawer = ({ fromList }) => {
           );
         })}
       </List>
-      {!fromList ? <List style={{ marginTop: 'auto', paddingBottom: 0 }}>
-        <ListItem>
-          <ListItemText>
-            <Kofi display={'inline-block'}/>
-          </ListItemText>
-        </ListItem>
-      </List> : null}
       <Divider/>
     </Stack>)
   );

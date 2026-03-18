@@ -15,7 +15,6 @@ import React, { useContext, useMemo, useState } from 'react';
 import { AppContext } from '../../context/AppProvider';
 import { prefix, sections } from 'utility/helpers';
 import Tooltip from '../../../Tooltip';
-import Kofi from '../../Kofi';
 
 const CharactersDrawer = () => {
   const { state, dispatch } = useContext(AppContext);
@@ -196,13 +195,6 @@ const CharactersDrawer = () => {
         </ListItem>
       </List>
       <Divider/>
-      <List style={{ marginTop: 'auto', paddingBottom: 0 }}>
-        <ListItem>
-          <ListItemText>
-            <Kofi display={'inline-block'}/>
-          </ListItemText>
-        </ListItem>
-      </List>
     </Stack>
   );
 };

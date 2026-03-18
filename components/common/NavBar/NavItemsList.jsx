@@ -2,13 +2,12 @@ import React, { useContext, useState } from 'react';
 import { NextLinkComposed } from '../NextLinkComposed';
 import { drawerWidth, navItems, offlinePages } from '../../constants';
 import { useRouter } from 'next/router';
-import { Collapse, List, ListItem, ListItemButton, ListItemText, Stack, useMediaQuery } from '@mui/material';
+import { Collapse, List, ListItemButton, ListItemText, Stack, useMediaQuery } from '@mui/material';
 import { AppContext } from '../context/AppProvider';
 import PinnedPages from '@components/common/favorites/PinnedPages';
 import AccountDrawer from '@components/common/NavBar/AppDrawer/AccountDrawer';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import Kofi from '@components/common/Kofi';
 import ToolsDrawer from '@components/common/NavBar/AppDrawer/ToolsDrawer';
 
 
@@ -90,13 +89,6 @@ const NavItemsList = ({ drawer }) => {
           );
         })}
         <PinnedPages text={'Pinned pages'}/>
-        {isXs && <List style={{ marginTop: 'auto', paddingBottom: 0 }}>
-          <ListItem>
-            <ListItemText>
-              <Kofi display={'inline-block'}/>
-            </ListItemText>
-          </ListItem>
-        </List>}
       </ItemsWrapper>
     </Stack>
   );
