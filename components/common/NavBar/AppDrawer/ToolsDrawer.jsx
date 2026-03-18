@@ -22,7 +22,8 @@ const ToolsDrawer = ({ fromList }) => {
       })
     }
 
-    router.push({ pathname: url });
+    const { t, nt, dnt, ...query } = router.query;
+    router.push({ pathname: url, query });
   }
 
   const isSelected = (label) => {
@@ -32,7 +33,7 @@ const ToolsDrawer = ({ fromList }) => {
   return <Stack sx={{ height: '100%' }}>
     <List sx={{ ...(fromList ? { padding: 0 } : {}) }}>
       {Object.entries(PAGES.TOOLS).map(([key, value], index) => {
-        if (!state?.signedIn && !offlineTools[key] && !state?.manualImport) return null;
+        if (!state?.signedIn && !offlineTools[key] && !state?.manualImport && !state?.profile) return null;
         const { icon } = value;
         const keyUri = key.split(/(?=[A-Z])/).map((str) => str.toLowerCase()).join('-');
         const formattedKey = key.split(/(?=[A-Z])/).join(' ').capitalize();

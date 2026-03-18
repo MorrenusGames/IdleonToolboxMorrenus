@@ -316,7 +316,9 @@ const AppProvider = ({ children }) => {
           const isAllowedPath = router.pathname === '/' ||
             checkOfflineTool() ||
             router.pathname === '/data' ||
-            router.pathname === '/statistics';
+            router.pathname === '/statistics' ||
+            state?.profile ||
+            state?.manualImport;
 
           if (!isAllowedPath) {
             router.push({ pathname: '/', query: router?.query });
