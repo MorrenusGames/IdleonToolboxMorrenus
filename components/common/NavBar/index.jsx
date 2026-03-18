@@ -8,7 +8,7 @@ import LoginButton from './LoginButton';
 import AppDrawer from './AppDrawer';
 import { drawerWidth, navBarHeight } from '../../constants';
 import { useRouter } from 'next/router';
-import { handleLoadJson, isProd, shouldDisplayDrawer } from '@utility/helpers';
+import { handleLoadJson, shouldDisplayDrawer } from '@utility/helpers';
 import { Stack, Typography, useMediaQuery } from '@mui/material';
 import { AppContext } from '../context/AppProvider';
 import AdBlockerPopup from '@components/common/AdBlockerPopup';
@@ -66,9 +66,9 @@ const NavBar = ({ children }) => {
           <AppDrawer/>
           <NavItemsList/>
           <QuickSearch/>
-          {!isProd ? <IconButton data-cy={'paste-data'} color="inherit" onClick={handlePaste}>
+          <IconButton data-cy={'paste-data'} color="inherit" onClick={handlePaste}>
             <FileCopyIcon/>
-          </IconButton> : null}
+          </IconButton>
           {renderAuthSection()}
         </Toolbar>
       </AppBar>
