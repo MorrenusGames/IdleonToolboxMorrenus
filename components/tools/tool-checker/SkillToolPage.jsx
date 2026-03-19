@@ -13,22 +13,14 @@ import React from 'react';
 import { cleanUnderscore, numberWithCommas, prefix } from 'utility/helpers';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 
-const statusColors = {
-  'up-to-date': 'success',
-  'can-craft': 'info',
-  'can-skip': 'info',
-  'missing-mats': 'warning'
-};
-
-const statusLabels = {
-  'up-to-date': 'Up to Date',
-  'can-craft': 'Can Craft',
-  'can-skip': 'Can Skip Tiers',
-  'missing-mats': 'Missing Mats'
-};
-
 const SkillToolPage = ({ config, result }) => {
   const { rows, swaps, materials, craftOrder } = result;
+
+  const groupedCraftOrder = {};
+  craftOrder.forEach((entry) => {
+    if (!groupedCraftOrder[entry.anvilTab]) groupedCraftOrder[entry.anvilTab] = [];
+    groupedCraftOrder[entry.anvilTab].push(entry);
+  });
 
   return (
     <Stack gap={3}>
@@ -40,8 +32,8 @@ const SkillToolPage = ({ config, result }) => {
               <TableRow>
                 <TableCell>Character</TableCell>
                 <TableCell>Class</TableCell>
-                <TableCell>Current Tool</TableCell>
-                <TableCell>Upgrade Target</TableCell>
+                <TableCell>Currently Has</TableCell>
+                <TableCell>Upgrade To</TableCell>
                 <TableCell>Status</TableCell>
               </TableRow>
             </TableHead>
@@ -77,7 +69,7 @@ const SkillToolPage = ({ config, result }) => {
                     )}
                   </TableCell>
                   <TableCell>
-                    {row.target ? (
+                    {row.target && row.status !== 'max' ? (
                       <Stack direction="row" alignItems="center" gap={0.5}>
                         <img
                           src={`${prefix}data/${row.target.rawName}.png`}
@@ -86,14 +78,12 @@ const SkillToolPage = ({ config, result }) => {
                         />
                         <Typography variant="body2">{cleanUnderscore(row.target.displayName)}</Typography>
                       </Stack>
-                    ) : '—'}
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">{'\u2014'}</Typography>
+                    )}
                   </TableCell>
                   <TableCell>
-                    <Chip
-                      size="small"
-                      label={statusLabels[row.status]}
-                      color={statusColors[row.status]}
-                    />
+                    <StatusDisplay row={row} />
                   </TableCell>
                 </TableRow>
               ))}
@@ -111,15 +101,13 @@ const SkillToolPage = ({ config, result }) => {
           {swaps.map((swap, i) => (
             <Stack key={i} direction="row" alignItems="center" gap={1}>
               <SwapHorizIcon color="info" />
-              <Typography variant="body2">
-                {swap.from}
-              </Typography>
+              <Typography variant="body2">{swap.from}</Typography>
               <img
                 src={`${prefix}data/${swap.tool?.rawName}.png`}
                 alt=""
                 style={{ width: 24, height: 24, objectFit: 'contain' }}
               />
-              <Typography variant="body2" color="text.secondary">→</Typography>
+              <Typography variant="body2" color="text.secondary">{'\u2192'}</Typography>
               <Typography variant="body2">{swap.to}</Typography>
             </Stack>
           ))}
@@ -170,41 +158,139 @@ const SkillToolPage = ({ config, result }) => {
       {craftOrder.length > 0 && (
         <Stack gap={1}>
           <Typography variant="h6">Craft Order</Typography>
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Item</TableCell>
-                  <TableCell align="right">Qty</TableCell>
-                  <TableCell>For</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {craftOrder.map(({ item, chars, qty }) => (
-                  <TableRow key={item.rawName}>
-                    <TableCell>
-                      <Stack direction="row" alignItems="center" gap={0.5}>
-                        <img
-                          src={`${prefix}data/${item.rawName}.png`}
-                          alt=""
-                          style={{ width: 28, height: 28, objectFit: 'contain' }}
-                        />
-                        <Typography variant="body2">{cleanUnderscore(item.displayName)}</Typography>
-                      </Stack>
-                    </TableCell>
-                    <TableCell align="right">{qty}</TableCell>
-                    <TableCell>
-                      <Typography variant="body2">{chars.join(', ')}</Typography>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          {Object.entries(groupedCraftOrder)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([tabName, entries]) => (
+              <Stack key={tabName} gap={1}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  gap={1}
+                  sx={{ bgcolor: 'action.hover', px: 1.5, py: 0.5, borderRadius: 1 }}
+                >
+                  <Typography variant="subtitle2">{tabName}</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    ({entries.length} item{entries.length !== 1 ? 's' : ''})
+                  </Typography>
+                </Stack>
+                <TableContainer>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ width: 40 }}>#</TableCell>
+                        <TableCell>Item</TableCell>
+                        <TableCell align="right">Qty</TableCell>
+                        <TableCell>For</TableCell>
+                        <TableCell>Materials</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {entries.map(({ item, chars, qty, isSlab, materials: mats }, stepIdx) => (
+                        <TableRow key={item.rawName}>
+                          <TableCell>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontWeight: isSlab ? 'bold' : 'normal', color: isSlab ? '#d29922' : 'text.secondary' }}
+                            >
+                              {stepIdx + 1}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Stack direction="row" alignItems="center" gap={0.5}>
+                              <img
+                                src={`${prefix}data/${item.rawName}.png`}
+                                alt=""
+                                style={{ width: 28, height: 28, objectFit: 'contain' }}
+                              />
+                              <Typography
+                                variant="body2"
+                                sx={{ fontWeight: isSlab ? 'bold' : 'normal', color: isSlab ? '#d29922' : 'text.primary' }}
+                              >
+                                {cleanUnderscore(item.displayName)}
+                              </Typography>
+                              {isSlab && (
+                                <Chip
+                                  size="small"
+                                  label="SLAB"
+                                  sx={{ height: 20, fontSize: '0.65rem', bgcolor: '#d29922', color: '#000', fontWeight: 'bold' }}
+                                />
+                              )}
+                            </Stack>
+                          </TableCell>
+                          <TableCell align="right">{qty}</TableCell>
+                          <TableCell>
+                            <Typography variant="body2">{chars.join(', ')}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Stack gap={0.25}>
+                              {mats?.map((mat) => (
+                                <Stack key={mat.itemName} direction="row" alignItems="center" gap={0.5}>
+                                  <img
+                                    src={`${prefix}data/${mat.rawName}.png`}
+                                    alt=""
+                                    style={{ width: 18, height: 18, objectFit: 'contain' }}
+                                  />
+                                  <Typography variant="caption" color="text.secondary">
+                                    {cleanUnderscore(mat.itemName)} x{numberWithCommas(mat.itemQuantity)}
+                                  </Typography>
+                                </Stack>
+                              ))}
+                            </Stack>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Stack>
+            ))}
         </Stack>
       )}
     </Stack>
   );
+};
+
+const StatusDisplay = ({ row }) => {
+  if (row.status === 'max') {
+    return (
+      <Stack gap={0.25}>
+        <Chip size="small" label="MAX" color="success" sx={{ width: 'fit-content' }} />
+        <Typography variant="caption" color="text.secondary">
+          Already at best tool for Lv {row.blockedInfo?.topTierLvl || '?'}
+        </Typography>
+      </Stack>
+    );
+  }
+
+  if (row.status === 'can-craft') {
+    return <Chip size="small" label="Can Craft" color="info" />;
+  }
+
+  if (row.status === 'can-skip') {
+    return <Chip size="small" label="Can Skip Tiers" color="info" />;
+  }
+
+  if (row.status === 'blocked') {
+    const { missing, nextTier } = row.blockedInfo || {};
+    return (
+      <Stack gap={0.25}>
+        <Chip size="small" label="BLOCKED" color="error" sx={{ width: 'fit-content' }} />
+        {missing?.length > 0 && (
+          <Typography variant="caption" color="text.secondary">
+            Need: {missing.map((m) => `${m.name} (${numberWithCommas(m.need - m.have)})`).join(' | ')}
+          </Typography>
+        )}
+        {nextTier && (
+          <Typography variant="caption" color="text.secondary">
+            Next tier: {nextTier.name} @ Lv {nextTier.lvReq}
+            {row.level < nextTier.lvReq ? ` (${nextTier.lvReq - row.level} to go)` : ''}
+          </Typography>
+        )}
+      </Stack>
+    );
+  }
+
+  return null;
 };
 
 export default SkillToolPage;
